@@ -158,6 +158,8 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
     @IBAction func validateToDo(_ sender: UIButton) {
         let indices = rowAndSectionOfElement(tag: sender.tag)
         sectionsToDo[indices[0]].remove(at: indices[1])
+        cellDeleted = true
+        valueSentFromShowViewController = nil
         tableview.reloadData()
     }
     
@@ -177,11 +179,11 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        if let valueToDisplay = valueSentFromShowViewController{
-            print("Tag valuetoDsiaplay: "+String(valueToDisplay.tag))
-            let indices = rowAndSectionOfElement(tag: valueToDisplay.tag)
-            sectionsToDo[indices[0]][indices[1]].setEtatTache(etat: valueToDisplay.isSelected)
+        let valueToDisplay = valueSentFromShowViewController
+        if valueToDisplay != nil{
+            print("Tag valuetoDsiaplay: "+String(valueToDisplay!.tag))
+            let indices = rowAndSectionOfElement(tag: valueToDisplay!.tag)
+            sectionsToDo[indices[0]][indices[1]].setEtatTache(etat: valueToDisplay!.isSelected)
         }
         
         tableview.reloadData()
