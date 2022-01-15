@@ -74,6 +74,8 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
             // Find the row of the cell
             let row = indexPath.row
             sectionsToDo[indexPath.section].remove(at: row)
+            cellDeleted = true
+            valueSentFromShowViewController = nil
             tableview.deleteRows(at: [indexPath], with: .fade)
         }
     }
