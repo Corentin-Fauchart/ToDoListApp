@@ -42,12 +42,12 @@ class ShowViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         if let toDo = data {
             titre.text = toDo.getNom()
             desc.text = toDo.getDescription()
             checkbox.isSelected = toDo.getEtatTache()
-            dateReal.date = toDo.getDateReal()
+            dateReal.date =  toDo.getDateReal()
         }else{
             titre.text = "ERROR"
             desc.text = "ERROR"
