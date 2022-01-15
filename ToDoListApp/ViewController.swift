@@ -68,7 +68,8 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
             let ajouterViewController = unwindSegue.source as! CreationViewController
             let titre = ajouterViewController.titleToAdd.text!
             let desc = ajouterViewController.descToAdd.text!
-            toDo.append(Todo(nom: titre, description: desc))
+            let dateReal = ajouterViewController.dateRealToAdd.date
+            toDo.append(Todo(nom: titre, description: desc, date: dateReal))
             tableview.reloadData()
         }
         if unwindSegue.identifier == "supprimerTache" {

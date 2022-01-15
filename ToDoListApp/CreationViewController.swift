@@ -12,10 +12,11 @@ class CreationViewController: UIViewController {
     @IBOutlet weak var buttonAdd: UIButton!
     @IBOutlet weak var titleToAdd: UITextField!
     @IBOutlet weak var descToAdd: UITextView!
+    @IBOutlet weak var dateRealToAdd: UIDatePicker!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        var borderColor : UIColor = UIColor(red: 0.85, green: 0.85, blue: 0.85, alpha: 1.0)
+        let borderColor : UIColor = UIColor(red: 0.85, green: 0.85, blue: 0.85, alpha: 1.0)
         descToAdd.layer.borderWidth = 0.5
         descToAdd.layer.borderColor = borderColor.cgColor
         descToAdd.layer.cornerRadius = 5.0

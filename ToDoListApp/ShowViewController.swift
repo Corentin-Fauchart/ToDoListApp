@@ -18,6 +18,7 @@ class ShowViewController: UIViewController {
     @IBOutlet weak var titre: UILabel!
     @IBOutlet weak var desc: UITextView!
     @IBOutlet weak var checkbox: UIButton!
+    @IBOutlet weak var dateReal: UIDatePicker!
     weak var delegate: ShowViewControllerDelegate?
     
     
@@ -46,10 +47,12 @@ class ShowViewController: UIViewController {
             titre.text = toDo.getNom()
             desc.text = toDo.getDescription()
             checkbox.isSelected = toDo.getEtatTache()
+            dateReal.date = toDo.getDateReal()
         }else{
             titre.text = "ERROR"
             desc.text = "ERROR"
             checkbox.isSelected = false
+            dateReal.date = Date()
         }
         // Do any additional setup after loading the view.
     }

@@ -11,12 +11,21 @@ class Todo: Codable {
     private var nom: String
     private var description: String
     private var tacheEffectuee: Bool
+    private var dateRealisation: Date
 
+    
+    init(nom: String, description: String, date: Date){
+        self.nom = nom
+        self.description = description
+        self.tacheEffectuee = false
+        self.dateRealisation  = date
+    }
     
     init(nom: String, description: String){
         self.nom = nom
         self.description = description
         self.tacheEffectuee = false
+        self.dateRealisation  = Date()
     }
     
     func setEtatTache(etat: Bool){
@@ -43,5 +52,12 @@ class Todo: Codable {
         return self.description
     }
     
+    func setDateReal(date: Date){
+        self.dateRealisation = date
+    }
+    
+    func getDateReal() -> Date{
+        return self.dateRealisation
+    }
     
 }
