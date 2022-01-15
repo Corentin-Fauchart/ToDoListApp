@@ -23,7 +23,6 @@ class ShowViewController: UIViewController {
     
     
     @IBAction func checkBoxTapped(_ sender: UIButton) {
-        print("mon gars")
         if sender.isSelected{
             sender.isSelected = false
         }else{
@@ -35,7 +34,6 @@ class ShowViewController: UIViewController {
         super.viewWillDisappear(animated)
         
         if self.isMovingFromParent {
-            print("On retourne chez papa")
             delegate?.changeValueCheckBox(checkbox)
         }
     }

@@ -20,7 +20,6 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
     @IBOutlet weak var tableview: UITableView!
     
     func rowAndSectionOfElement(tag: Int) -> [Int] {
-        print("Valeur du tag : "+String(tag))
         let nbSections = numberOfSections(in: tableview)
         var foundSection = false
         var compteur = 0
@@ -62,7 +61,6 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        print("Section : "+String(section))
         return sectionsToDo[section].count
     }
     
@@ -88,7 +86,6 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("apparait avant2")
         // Do any additional setup after loading the view.
         sectionsToDo.removeAll(keepingCapacity: true)
         dateFormatter.locale = Locale(identifier: "FR-fr")
@@ -110,7 +107,6 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        print("HELLO DEAR")
         if let vc = segue.destination as? ShowViewController {
             vc.delegate = self
             let row = tableview.indexPathForSelectedRow!.row
@@ -151,7 +147,6 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
         }
         if unwindSegue.identifier == "supprimerTache" {
             let showViewController = unwindSegue.source as! ShowViewController
-            print("OUIIIII")
             let indices = rowAndSectionOfElement(tag: showViewController.checkbox.tag)
             sectionsToDo[indices[0]].remove(at: indices[1])
             cellDeleted = true
@@ -182,7 +177,6 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
         
         if let valueToDisplay = valueSentFromShowViewController{
             let indices = rowAndSectionOfElement(tag: valueToDisplay.tag)
-            print("Value from display = \(valueToDisplay)")
             sectionsToDo[indices[0]][indices[1]].setEtatTache(etat: valueToDisplay.isSelected)
             tableview.reloadData()
         }
