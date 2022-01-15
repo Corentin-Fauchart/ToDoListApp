@@ -7,13 +7,18 @@
 
 import UIKit
 
+/*
+ Ce Delegate va permettre de lier les checkbox de cette classe avec la classe parente ViewController
+ Nous sommes obligé de passer par un delegate pour faire la liaison étant donné que le bouton permettant de revenir à l'écran précédent
+ n'a aucun évènement pour transmettre cette information autrement.
+ */
 protocol ShowViewControllerDelegate : AnyObject {
     func changeValueCheckBox(_ valueToChange: UIButton)
 }
 
 class ShowViewController: UIViewController {
     var data: Todo?
-    var indiceData: Int?
+    var indiceData: Int!
     
     @IBOutlet weak var titre: UILabel!
     @IBOutlet weak var desc: UITextView!
@@ -21,7 +26,9 @@ class ShowViewController: UIViewController {
     @IBOutlet weak var dateReal: UIDatePicker!
     weak var delegate: ShowViewControllerDelegate?
     
-    
+    /*
+     Cette fonction change l'état de notre checkbox quand on clique dessus (activé/désactivé).
+     */
     @IBAction func checkBoxTapped(_ sender: UIButton) {
         if sender.isSelected{
             sender.isSelected = false
@@ -33,8 +40,8 @@ class ShowViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        if self.isMovingFromParent {
-            delegate?.changeValueCheckBox(checkbox)
+        if self.isMovingFromParent { //Lorsque l'on retourne à l'écran parent
+            delegate?.changeValueCheckBox(checkbox) // On appelle la fonction déninie dans notre protocol
         }
     }
     
@@ -52,6 +59,10 @@ class ShowViewController: UIViewController {
             checkbox.isSelected = false
             dateReal.date = Date()
         }
+        
+        checkbox.tag = indiceData
+        
+        
         // Do any additional setup after loading the view.
     }
     

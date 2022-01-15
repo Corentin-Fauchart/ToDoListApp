@@ -12,7 +12,6 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
     var valueSentFromShowViewController: UIButton?
     var cellDeleted: Bool?
     
-    let dateFormatter = DateFormatter()
     var currentDate: Date = Date()
     var sectionHeaderTitles = [String]()
     var sectionsToDo = [[Todo]]()
@@ -25,31 +24,26 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
         var compteur = 0
         var nbRowAndSection = [Int]()
         for i in 0...nbSections-1{
-            compteur += tableView(tableview, numberOfRowsInSection: i)
-            if !foundSection && compteur > tag{
+            compteur += tableView(tableview, numberOfRowsInSection: i) + 1
+            if !foundSection && compteur >= tag{
                 foundSection = true
                 nbRowAndSection.append(i)
-                nbRowAndSection.append(compteur-tag-1)
+                nbRowAndSection.append(compteur-tag)
             }
         }
         return nbRowAndSection
     }
     
     
-    func nbPreviousSectionsElements(currentSection: Int) -> Int {
+    func nbSectionsElements(currentSection: Int, position: Int) -> Int {
         var res = 0
-        if currentSection > 0 {
-            for i in 0...currentSection-1{
-                res += tableView(tableview, numberOfRowsInSection: i)
+        if currentSection >= 0 {
+            for i in 0...currentSection{
+                res += tableView(tableview, numberOfRowsInSection: i) + 1
             }
+            res -= position
         }
         return res
-    }
-    
-    @IBAction func validateToDo(_ sender: UIButton) {
-        let indices = rowAndSectionOfElement(tag: sender.tag)
-        sectionsToDo[indices[0]].remove(at: indices[1])
-        tableview.reloadData()
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -68,9 +62,9 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
         let cell = tableview.dequeueReusableCell(withIdentifier: "cellContent", for: indexPath) as! TableViewCell
         
         cell.titre.text = sectionsToDo[indexPath.section][indexPath.row].getNom()
-        cell.bouton.tag = indexPath.row + nbPreviousSectionsElements(currentSection: indexPath.section)
-        cell.checkBoxValidate.tag = indexPath.row + nbPreviousSectionsElements(currentSection: indexPath.section)
-        
+        cell.bouton.tag = nbSectionsElements(currentSection: indexPath.section, position: indexPath.row)
+        cell.checkBoxValidate.tag = nbSectionsElements(currentSection: indexPath.section, position: indexPath.row)
+        print("tag de l'élément : "+String(cell.checkBoxValidate.tag))
         cell.checkBoxValidate.isSelected = sectionsToDo[indexPath.section][indexPath.row].getEtatTache()
         return cell
     }
@@ -88,8 +82,6 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         sectionsToDo.removeAll(keepingCapacity: true)
-        dateFormatter.locale = Locale(identifier: "FR-fr")
-        dateFormatter.dateFormat = "dd-MM-yyyy"
         
         sectionHeaderTitles.append("Aujourd'hui")
         sectionHeaderTitles.append("Demain")
@@ -105,7 +97,10 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
         tableview.dataSource = self
         tableview.reloadData()
     }
-
+    
+    /*
+     On envoie les données à afficher dans la nouvelle vue ShowViewController
+     */
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let vc = segue.destination as? ShowViewController {
             vc.delegate = self
@@ -113,14 +108,18 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
             let section = tableview.indexPathForSelectedRow!.section
             
             vc.data = sectionsToDo[section][row]
-            vc.indiceData = row
+            vc.indiceData = nbSectionsElements(currentSection: section, position: row)
             cellDeleted = false
         }
         
     }
     
+    /*
+     Fonction appelée lorsque l'on retourne sur cette vue à partir d'un bouton (autre qu'un bouton de navigation)
+     présent sur une autre vue.
+     */
     @IBAction func backToMainView(_ unwindSegue: UIStoryboardSegue) {
-        if unwindSegue.identifier == "ajouterTache" {
+        if unwindSegue.identifier == "ajouterTache" { // On souhaite ajouter une nouvelle tâche dans notre liste
             let ajouterViewController = unwindSegue.source as! CreationViewController
             let titre = ajouterViewController.titleToAdd.text!
             let desc = ajouterViewController.descToAdd.text!
@@ -129,7 +128,6 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
             
             let dateElement =  newTodo.getDateReal()
             let tomorrow = addOrSubstrateDays(date: currentDate, nb: 1)
-            //let twodayslater = addOrSubstrateDays(date: currentDate, nb: 2)
             let weekLater = addOrSubstrateDays(date: currentDate, nb: 7)
             
             if Calendar.current.compare(dateElement, to: currentDate, toGranularity: .day) == .orderedSame{
@@ -145,17 +143,22 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
             print(sectionsToDo)
             tableview.reloadData()
         }
-        if unwindSegue.identifier == "supprimerTache" {
+        if unwindSegue.identifier == "supprimerTache" { // On souhaite supprimer une tâche de notre liste
             let showViewController = unwindSegue.source as! ShowViewController
-            let indices = rowAndSectionOfElement(tag: showViewController.checkbox.tag)
+            print("Tag : "+String(showViewController.indiceData))
+            let indices = rowAndSectionOfElement(tag: showViewController.indiceData!)
             sectionsToDo[indices[0]].remove(at: indices[1])
             cellDeleted = true
+            valueSentFromShowViewController = nil
             
             tableview.reloadData()
         }
-        
-        
-        // Use data from the view controller which initiated the unwind segue
+    }
+    
+    @IBAction func validateToDo(_ sender: UIButton) {
+        let indices = rowAndSectionOfElement(tag: sender.tag)
+        sectionsToDo[indices[0]].remove(at: indices[1])
+        tableview.reloadData()
     }
     
     
@@ -176,15 +179,21 @@ class ViewController: UIViewController, UITableViewDataSource, ShowViewControlle
         super.viewWillAppear(animated)
         
         if let valueToDisplay = valueSentFromShowViewController{
+            print("Tag valuetoDsiaplay: "+String(valueToDisplay.tag))
             let indices = rowAndSectionOfElement(tag: valueToDisplay.tag)
             sectionsToDo[indices[0]][indices[1]].setEtatTache(etat: valueToDisplay.isSelected)
-            tableview.reloadData()
         }
+        
+        tableview.reloadData()
         
     }
     
+    /*
+     Enregistre dans une variable la checkbox de la vue enfant (ShowViewController) pour que lorsque l'écran apparait (fonction juste au dessus de celle-ci),
+     nous changions l'état de la checkbox de la vue parente (cette vue ci) pour que leur état corresponde entre eux
+     */
     func changeValueCheckBox(_ valueToChange: UIButton) {
-        if !cellDeleted!{
+        if !cellDeleted!{ // Uniquement si nous ne venons pas d'effectuer une supression de cellule
             self.valueSentFromShowViewController = valueToChange
         }
     }
